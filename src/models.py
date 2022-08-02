@@ -67,7 +67,7 @@ class PostModel(BaseModel, CRUD):
             session.add(PostModel(
                 title=data.title,
                 text=data.text,
-                author_id=data.authorId
+                author_id=data.authorId,
             ))
             session.commit()
         except Exception as error:
@@ -97,7 +97,7 @@ class CommentModel(BaseModel, CRUD):
                 text=data.text,
                 parent_id=data.parentId,
                 post_id=data.postId,
-                author_id=data.authorId
+                author_id=data.authorId,
             ))
             session.commit()
         except Exception as error:
