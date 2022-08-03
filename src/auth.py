@@ -5,6 +5,7 @@ import jwt
 from fastapi import Request, HTTPException
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 
+from .utils import utils
 from .models import UserModel
 from config import Config, logger
 
@@ -31,10 +32,11 @@ class AutoHandler:
         payload = AutoHandler.decode_jwt_token(token)
         if not payload:
             return False
-        # {'userId': 12, 'createToken': '2022-08-03 10:06:57.502828', 'expireToken': '2022-08-05 10:06:57.502828'}
         try:
             UserModel.read(payload.get("userId"))
         except Exception:
+            return False
+        if not utils.is_time(payload.get("expireToken")):
             return False
         return True
 
