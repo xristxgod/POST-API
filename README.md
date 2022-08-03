@@ -30,3 +30,5 @@ Work with posts and comments tree. How on: reddit.com
 
 
 ## Screenshot API:
+
+![img.png](docs/img.png)
