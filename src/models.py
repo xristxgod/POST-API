@@ -27,7 +27,7 @@ class UserModel(BaseModel, CRUD):
     last_name = Column(VARCHAR(50), nullable=True)
 
     @staticmethod
-    def create(data: BodyUser) -> bool:
+    def create(data: BodyCreateUser) -> bool:
         """Create new user"""
         try:
             session.add(UserModel(
@@ -37,6 +37,7 @@ class UserModel(BaseModel, CRUD):
                 last_name=data.lastName
             ))
             session.commit()
+            return True
         except Exception as error:
             logger.error(f"{error}")
             session.rollback()

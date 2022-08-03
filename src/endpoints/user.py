@@ -1,24 +1,41 @@
 from fastapi import APIRouter
 
-from ..base.schemas import BodyUser, ResponseCreateUser
+from ..base.schemas import BodyCreateUser, ResponseCreateUser, BodyLoginUser, ResponseLoginUser
 from ..models import UserModel
 
 
-router = APIRouter()
+router = APIRouter(
+    tags=["Authorization"]
+)
 
 
 @router.post(
     "/registration",
-    tags=["Authorization"],
     response_model=ResponseCreateUser
 )
-async def registration(body: BodyUser):
+async def registration(body: BodyCreateUser):
     """
     Registration new user
 
     - **username**: user username
     - **password**: user password
-    - **firstName**: first name
-    - **lastName**: last name
+    - **firstName**: first name (optional)
+    - **lastName**: last name (optional)
     """
     return ResponseCreateUser(status=UserModel.create(data=body))
+
+
+@router.post(
+    "/login",
+    response_model=ResponseLoginUser
+)
+async def login(body: BodyLoginUser):
+    """
+    Login user
+
+    - **username**: user username
+    - **password**: user password
+    """
+
+
+

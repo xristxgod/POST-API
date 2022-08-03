@@ -7,9 +7,9 @@ from pydantic import BaseModel, Field, validator
 # <<<=======================================>>> Body <<<=============================================================>>>
 
 
-class BodyUser(BaseModel):
-    username: str = Field(description="Username", max_length=50)
-    password: str = Field(description="Password", max_length=50)
+class BodyCreateUser(BaseModel):
+    username: str = Field(description="Username", max_length=50, min_length=4)
+    password: str = Field(description="Password", max_length=50, min_length=8)
     firstName: Optional[str] = Field(description="First name", max_length=50, default=None)
     lastName: Optional[str] = Field(description="Last name", max_length=50, default=None)
 
@@ -32,6 +32,19 @@ class BodyUser(BaseModel):
                 "password": "0000",
                 "firstName": "Murad",
                 "lastName": "Mamedov",
+            }
+        }
+
+
+class BodyLoginUser(BaseModel):
+    username: str = Field(description="Username", max_length=50, min_length=4)
+    password: str = Field(description="Password", max_length=50, min_length=8)
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "username": "root",
+                "password": "0000"
             }
         }
 
@@ -71,5 +84,22 @@ class ResponseCreateUser(BaseModel):
         schema_extra = {
             "example": {
                 "status": True
+            }
+        }
+
+
+class ResponseLoginUser(BaseModel):
+    successLogin: bool = Field()
+    username: str = Field()
+    token: str = Field()
+    expireToken: datetime = Field()
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "successLogin": True,
+                "username": "root",
+                "token": "EYwuqFJmFuuqZq6zpcb7PMah2SbKTMkY",
+                "expireToken": datetime.now()
             }
         }

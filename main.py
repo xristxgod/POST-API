@@ -24,4 +24,6 @@ async def shutdown():
 
 if __name__ == '__main__':
     import uvicorn
+    # from src.models import create_db
+    # print(create_db())
     uvicorn.run("main:app", port=8080)
