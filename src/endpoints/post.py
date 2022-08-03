@@ -36,6 +36,7 @@ async def get_all_posts_by_user_id(request: Request):
                     id=comment.id,
                     text=comment.text,
                     parentId=comment.create_at,
+                    parentCommentId=comment.parent_comment_id,
                     postId=comment.update_at,
                     createAt=comment.parent_id,
                     updateAt=comment.post_id,
@@ -68,6 +69,7 @@ async def get_all_posts():
                 ResponseComment(
                     id=comment.id,
                     text=comment.text,
+                    parentCommentId=comment.parent_comment_id,
                     parentId=comment.parent_id,
                     postId=comment.post_id,
                     createAt=comment.create_at,

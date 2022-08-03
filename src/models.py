@@ -159,6 +159,7 @@ class PostModel(BaseModel, CRUD):
                         id=comment.id,
                         text=comment.text,
                         parentId=comment.parent_id,
+                        parentCommentId=comment.parent_comment_id,
                         postId=comment.post_id,
                         createAt=comment.create_at,
                         updateAt=comment.update_at,
@@ -216,6 +217,7 @@ class CommentModel(BaseModel, CRUD):
     text = Column(Text, default="Not text")
     create_at = Column(DateTime, default=datetime.now(), nullable=True)
     update_at = Column(DateTime, default=datetime.now(), nullable=True)
+    parent_comment_id = Column(Integer, nullable=True, default=None)
     parent_id = Column(Integer, ForeignKey("user_model.id", ondelete="SET NULL"), default=None, nullable=True)
     post_id = Column(Integer, ForeignKey("post_model.id", ondelete="CASCADE"))
     author_id = Column(Integer, ForeignKey("user_model.id", ondelete="SET NULL"))
@@ -256,6 +258,7 @@ class CommentModel(BaseModel, CRUD):
                 id=comment.id,
                 text=comment.text,
                 parentId=comment.parent_id,
+                parentCommentId=comment.parent_comment_id,
                 postId=comment.post_id,
                 createAt=comment.create_at,
                 updateAt=comment.update_at,

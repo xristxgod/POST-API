@@ -29,6 +29,7 @@ class DataComment:
     commentId: Optional[int] = field(default=None)
     text: Optional[str] = field(default=None)
     parentId: Optional[int] = field(default=None)
+    parentCommentId: Optional[int] = field(default=None)
     postId: Optional[int] = field(default=None)
     authorId: Optional[int] = field(default=None)
 
@@ -110,12 +111,14 @@ class BodyModPost(BaseModel):
 
 class BodyModComment(BaseModel):
     text: Optional[str] = Field(description="Comment text", default=None)
+    parentCommentId: Optional[int] = Field(description="ID of the comment being commented on", default=None)
     parentId: Optional[int] = Field(description="ID of the person whose comment was answered!", default=None)
 
     class Config:
         schema_extra = {
             "example": {
                 "text": "This is a good post!",
+                "parentCommentId": 2,
                 "parentId": 1,
             }
         }
@@ -168,6 +171,7 @@ class ResponseUser(BaseModel):
 class ResponseComment(BaseModel):
     id: int = Field(description="Comment ID")
     text: str = Field(description="Comment text")
+    parentCommentId: Optional[int] = Field(description="ID of the comment being commented on", default=None)
     parentId: Optional[int] = Field(description="ID of the person whose comment was answered!", default=None)
     postId: int = Field(description="Post id")
     createAt: datetime = Field(description="Create comment time")
@@ -179,6 +183,7 @@ class ResponseComment(BaseModel):
             "example": {
                 "id": 14,
                 "text": "This is a good post",
+                "parentCommentId": 2,
                 "parentId": 55,
                 "postId": 1,
                 "createAt": "2022-08-03 14:34:07.613685",
@@ -210,6 +215,7 @@ class ResponsePost(BaseModel):
                     {
                         "id": 14,
                         "text": "This is a good post",
+                        "parentCommentId": 2,
                         "parentId": 55,
                         "postId": 1,
                         "createAt": "2022-08-03 14:34:07.613685",

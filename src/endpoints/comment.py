@@ -28,6 +28,7 @@ async def get_all_comments_by_post(query: QueryPost = Depends()):
             id=comment.id,
             text=comment.text,
             parentId=comment.parent_id,
+            parentCommentId=comment.parent_comment_id,
             postId=comment.post_id,
             createAt=comment.create_at,
             updateAt=comment.update_at,
@@ -52,6 +53,7 @@ async def get_all_comments_by_user_id(request: Request):
             id=comment.id,
             text=comment.text,
             parentId=comment.parent_id,
+            parentCommentId=comment.parent_comment_id,
             postId=comment.post_id,
             createAt=comment.create_at,
             updateAt=comment.update_at,
@@ -77,6 +79,7 @@ async def create_comment(request: Request, body: BodyModComment, query: QueryPos
     return ResponseStatus(status=CommentModel.create(data=DataComment(
         text=body.text,
         parentId=body.parentId,
+        parentCommentId=body.parentCommentId,
         postId=query.postId,
         authorId=AutoHandler.decode_jwt_token(request.headers.get("Authorization").split(" ")[1])["userId"]
     )))
