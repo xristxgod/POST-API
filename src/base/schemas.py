@@ -7,6 +7,14 @@ from pydantic import BaseModel, Field, validator
 
 # <<<=======================================>>> Dataclasses <<<======================================================>>>
 
+@dataclass()
+class DataUser:
+    userId: Optional[int] = field(default=None)
+    username: Optional[str] = field(default=None)
+    password: Optional[str] = field(default=None)
+    firstName: Optional[str] = field(default=None)
+    lastName: Optional[str] = field(default=None)
+
 
 @dataclass()
 class DataPost:
@@ -39,9 +47,9 @@ class QueryComment(BaseModel):
 # <<<=======================================>>> Body <<<=============================================================>>>
 
 
-class BodyCreateUser(BaseModel):
-    username: str = Field(description="Username", max_length=50, min_length=4)
-    password: str = Field(description="Password", max_length=50, min_length=8)
+class BodyModUser(BaseModel):
+    username: Optional[str] = Field(description="Username", max_length=50, min_length=4, default=None)
+    password: Optional[str] = Field(description="Password", max_length=50, min_length=8, default=None)
     firstName: Optional[str] = Field(description="First name", max_length=50, default=None)
     lastName: Optional[str] = Field(description="Last name", max_length=50, default=None)
 

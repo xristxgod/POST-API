@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, Request, HTTPException
 
 from ..auth import JWTBearer, AutoHandler, auth_repository
-from ..base.schemas import BodyCreateUser, ResponseStatus, BodyLoginUser, ResponseLoginUser, ResponseUser
+from ..base.schemas import DataUser, BodyModUser, ResponseStatus, BodyLoginUser, ResponseLoginUser, ResponseUser
 from ..models import UserModel, session
 
 
@@ -13,7 +13,7 @@ router = APIRouter()
     response_model=ResponseStatus,
     tags=["Authorization"]
 )
-async def registration(body: BodyCreateUser):
+async def registration(body: BodyModUser):
     """
     Registration new user
 
@@ -72,8 +72,22 @@ async def get_current_user(request: Request):
     response_model=ResponseStatus,
     tags=["User"]
 )
-async def update_user(request: Request):
-    pass
+async def update_user(request: Request, body=BodyModUser):
+    """
+    Update user info
+
+    - **username**: user username
+    - **password**: user password
+    - **firstName**: first name
+    - **lastName**: last name
+    """
+    return ResponseStatus(status=UserModel.update(data=DataUser(
+        userId=AutoHandler.decode_jwt_token(request.headers.get("Authorization").split(" ")[1])["userId"],
+        username=body.username,
+        password=body.password,
+        firstName=body.firstName,
+        lastName=body.lastName
+    )))
 
 
 @router.delete(
@@ -83,4 +97,12 @@ async def update_user(request: Request):
     tags=["User"]
 )
 async def delete_user(request: Request):
-    pass
+    """
+    Delete user by id
+    :param request:
+    :return:
+    """
+    user_id = AutoHandler.decode_jwt_token(request.headers.get("Authorization").split(" ")[1])["userId"]
+    status = ResponseStatus(status=UserModel.delete(user_id=user_id,))
+    auth_repository.delete(user_id)
+    return status

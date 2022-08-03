@@ -6,7 +6,7 @@ from sqlalchemy import Column, ForeignKey, orm
 from sqlalchemy.types import Integer, VARCHAR, Text, DateTime
 
 from src.base.schemas import (
-    BodyCreateUser, ResponseUser,
+    BodyModUser, DataUser, ResponseUser,
     DataComment, ResponseComment,
     DataPost, ResponsePost
 )
@@ -32,7 +32,7 @@ class UserModel(BaseModel, CRUD):
         return f"{self.username}"
 
     @staticmethod
-    def create(data: BodyCreateUser) -> bool:
+    def create(data: BodyModUser) -> bool:
         """Create new user"""
         try:
             session.add(UserModel(
@@ -68,6 +68,42 @@ class UserModel(BaseModel, CRUD):
         except Exception as error:
             logger.error(f"{error}")
             raise ValueError("Is there something wrong!")
+        finally:
+            session.close()
+
+    @staticmethod
+    def update(data: DataUser) -> bool:
+        try:
+            user: UserModel = session.query(UserModel).get(data.userId)
+            if not user:
+                raise NotImplementedError
+            if data.username is not None:
+                user.username = data.username
+            if data.password is not None:
+                user.password = data.password
+            if data.firstName is not None:
+                user.firstName = data.firstName
+            if data.lastName is not None:
+                user.lastName = data.lastName
+            session.commit()
+            return True
+        except NotImplementedError:
+            raise fastapi.HTTPException(detail="This user was not found.", status_code=404)
+        except Exception as error:
+            logger.error(f"{error}")
+            session.rollback()
+            return False
+        finally:
+            session.close()
+
+    @staticmethod
+    def delete(user_id: int) -> bool:
+        try:
+            session.query(UserModel).filter_by(id=user_id).delete()
+            return True
+        except Exception as error:
+            logger.error(f"{error}")
+            return False
         finally:
             session.close()
 
