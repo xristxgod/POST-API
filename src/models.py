@@ -117,6 +117,18 @@ class PostModel(BaseModel, CRUD):
                 createAt=post.create_at,
                 updateAt=post.update_at,
                 authorId=post.author_id,
+                comments=[
+                    ResponseComment(
+                        id=comment.id,
+                        text=comment.text,
+                        parentId=comment.parent_id,
+                        postId=comment.post_id,
+                        createAt=comment.create_at,
+                        updateAt=comment.update_at,
+                        authorId=comment.author_id
+                    )
+                    for comment in session.query(CommentModel).filter_by(post_id=post.id).all()
+                ]
             )
         except NotImplementedError as error:
             raise ValueError("This post was not found.")

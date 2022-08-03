@@ -3,8 +3,8 @@ from typing import List
 from fastapi import APIRouter, Depends, Request, HTTPException
 
 from ..auth import JWTBearer, AutoHandler
-from ..models import PostModel, session
-from ..base.schemas import BodyModPost, DataPost, QueryPost, ResponsePost, ResponseStatus
+from ..models import PostModel, CommentModel, session
+from ..base.schemas import BodyModPost, DataPost, QueryPost, ResponsePost, ResponseStatus, ResponseComment
 
 
 router = APIRouter(
@@ -30,7 +30,19 @@ async def get_all_posts_by_user_id(request: Request):
             text=post.text,
             createAt=post.create_at,
             updateAt=post.update_at,
-            authorId=post.author_id
+            authorId=post.author_id,
+            comments=[
+                ResponseComment(
+                    id=comment.id,
+                    text=comment.text,
+                    parentId=comment.create_at,
+                    postId=comment.update_at,
+                    createAt=comment.parent_id,
+                    updateAt=comment.post_id,
+                    authorId=comment.author_id
+                )
+                for comment in session.query(CommentModel).filter_by(post_id=post.id).all()
+            ]
         )
         for post in session.query(PostModel).filter_by(author_id=user_id).all()
     ]
@@ -51,7 +63,19 @@ async def get_all_posts():
             text=post.text,
             createAt=post.create_at,
             updateAt=post.update_at,
-            authorId=post.author_id
+            authorId=post.author_id,
+            comments=[
+                ResponseComment(
+                    id=comment.id,
+                    text=comment.text,
+                    parentId=comment.parent_id,
+                    postId=comment.post_id,
+                    createAt=comment.create_at,
+                    updateAt=comment.update_at,
+                    authorId=comment.author_id
+                )
+                for comment in session.query(CommentModel).filter_by(post_id=post.id).all()
+            ]
         )
         for post in session.query(PostModel).all()
     ]
