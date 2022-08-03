@@ -64,3 +64,23 @@ async def get_current_user(request: Request):
     return UserModel.read(
         AutoHandler.decode_jwt_token(request.headers.get("Authorization").split(" ")[1]).get("userId")
     )
+
+
+@router.put(
+    "/user",
+    dependencies=[Depends(JWTBearer())],
+    response_model=ResponseStatus,
+    tags=["User"]
+)
+async def update_user(request: Request):
+    pass
+
+
+@router.delete(
+    "/user",
+    dependencies=[Depends(JWTBearer())],
+    response_model=ResponseStatus,
+    tags=["User"]
+)
+async def delete_user(request: Request):
+    pass
