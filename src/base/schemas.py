@@ -4,23 +4,36 @@ from datetime import datetime
 from pydantic import BaseModel, Field, validator
 
 
+# <<<=======================================>>> Body <<<=============================================================>>>
+
+
 class BodyUser(BaseModel):
     username: str = Field(description="Username", max_length=50)
     password: str = Field(description="Password", max_length=50)
     firstName: Optional[str] = Field(description="First name", max_length=50, default=None)
     lastName: Optional[str] = Field(description="Last name", max_length=50, default=None)
 
-    @validator("username")
-    def valid_username(cls, username: str):
-        pass
-
     @validator("firstName")
     def valid_first_name(cls, first_name: str):
-        pass
+        if isinstance(first_name, str):
+            return first_name.title()
+        raise ValueError("First name must be a string!")
 
     @validator("lastName")
     def valid_last_name(cls, last_name: str):
-        pass
+        if isinstance(last_name, str):
+            return last_name.title()
+        raise ValueError("Last name must be a string!")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "username": "root",
+                "password": "0000",
+                "firstName": "Murad",
+                "lastName": "Mamedov",
+            }
+        }
 
 
 class BodyCreatePost(BaseModel):
@@ -46,3 +59,17 @@ class BodyCreateComment(BaseModel):
     parentId: int
     postId: int
     authorId: int
+
+
+# <<<=======================================>>> Response <<<=========================================================>>>
+
+
+class ResponseCreateUser(BaseModel):
+    status: bool = Field(description="Status registration")
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "status": True
+            }
+        }

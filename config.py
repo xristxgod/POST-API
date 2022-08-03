@@ -5,10 +5,10 @@ import logging
 ROOT_DIR = os.path.dirname(os.path.abspath(__file__))
 
 logger = logging.getLogger(__name__)
-logging.basicConfig(
-    format=u"[%(asctime)s][%(filename)s][LINE:%(lineno)d][%(levelname)s] | %(message)s",
-    level=logging.INFO
-)
+# logging.basicConfig(
+#     format=u"[%(asctime)s][%(filename)s][LINE:%(lineno)d][%(levelname)s] | %(message)s",
+#     level=logging.INFO
+# )
 
 
 class Config:

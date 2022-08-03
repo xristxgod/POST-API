@@ -26,9 +26,6 @@ class UserModel(BaseModel, CRUD):
     first_name = Column(VARCHAR(50), nullable=True)
     last_name = Column(VARCHAR(50), nullable=True)
 
-    authors = orm.relationship("PostModel", backref="user", lazy=True)
-    comments = orm.relationship("CommentModel", backref="user", lazy=True)
-
     @staticmethod
     def create(data: BodyUser) -> bool:
         """Create new user"""
@@ -58,7 +55,7 @@ class PostModel(BaseModel, CRUD):
     update_at = Column(DateTime, default=datetime.now(), nullable=True)
     author_id = Column(Integer, ForeignKey("user_model.id", ondelete="SET NULL"))
 
-    posts = orm.relationship('CommentModel', backref='post', lazy=True)
+    authors = orm.relationship("UserModel", foreign_keys="PostModel.author_id")
 
     @staticmethod
     def create(data: BodyCreatePost) -> bool:
@@ -88,6 +85,10 @@ class CommentModel(BaseModel, CRUD):
     parent_id = Column(Integer, ForeignKey("user_model.id", ondelete="SET NULL"), default=None, nullable=True)
     post_id = Column(Integer, ForeignKey("post_model.id", ondelete="CASCADE"))
     author_id = Column(Integer, ForeignKey("user_model.id", ondelete="SET NULL"))
+
+    parents = orm.relationship("UserModel", foreign_keys="CommentModel.parent_id")
+    authors = orm.relationship("UserModel", foreign_keys="CommentModel.author_id")
+    posts = orm.relationship('PostModel', foreign_keys="CommentModel.post_id")
 
     @staticmethod
     def create(data: BodyCreateComment) -> bool:
