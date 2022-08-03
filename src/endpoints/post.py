@@ -23,6 +23,7 @@ async def get_all_posts():
     """
     return [
         ResponsePost(
+            id=post.id,
             title=post.title,
             text=post.text,
             createAt=post.create_at,

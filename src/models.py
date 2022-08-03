@@ -6,7 +6,7 @@ from sqlalchemy.types import Integer, VARCHAR, Text, DateTime
 
 from src.base.schemas import (
     BodyCreateUser, ResponseUser,
-    BodyCreateComment,
+    DataComment, ResponseComment,
     DataPost, ResponsePost
 )
 from .base import CRUD
@@ -56,6 +56,7 @@ class UserModel(BaseModel, CRUD):
             if not user:
                 raise NotImplementedError
             return ResponseUser(
+                id=user.id,
                 username=user.username,
                 password=user.password,
                 firstName=user.first_name,
@@ -82,6 +83,9 @@ class PostModel(BaseModel, CRUD):
 
     authors = orm.relationship("UserModel", foreign_keys="PostModel.author_id")
 
+    def __repr__(self):
+        return f"{self.title}"
+
     @staticmethod
     def create(data: DataPost) -> bool:
         """Create new post"""
@@ -107,6 +111,7 @@ class PostModel(BaseModel, CRUD):
             if not post:
                 raise NotImplementedError
             return ResponsePost(
+                id=post.id,
                 title=post.title,
                 text=post.text,
                 createAt=post.create_at,
@@ -170,8 +175,11 @@ class CommentModel(BaseModel, CRUD):
     authors = orm.relationship("UserModel", foreign_keys="CommentModel.author_id")
     posts = orm.relationship('PostModel', foreign_keys="CommentModel.post_id")
 
+    def __repr__(self):
+        return f"{self.post_id}@{self.author_id}"
+
     @staticmethod
-    def create(data: BodyCreateComment) -> bool:
+    def create(data: DataComment) -> bool:
         """Create new comment"""
         try:
             session.add(CommentModel(
@@ -187,6 +195,10 @@ class CommentModel(BaseModel, CRUD):
             return False
         finally:
             session.close()
+
+    @staticmethod
+    def read(comment_id: int) -> ResponseComment:
+        pass
 
 
 def create_db():
