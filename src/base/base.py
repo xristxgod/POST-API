@@ -1,8 +1,5 @@
-from abc import ABC, abstractmethod
 
-
-class CRUD(ABC):
+class CRUD:
     @staticmethod
-    @abstractmethod
     def create(data: object) -> bool:
-        ...
+        raise NotImplementedError
