@@ -9,3 +9,7 @@ class CRUD:
     @staticmethod
     def read(**kwargs: Any) -> object:
         raise NotImplementedError
+
+    @staticmethod
+    def update(data: object) -> bool:
+        raise NotImplementedError
