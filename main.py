@@ -1,6 +1,5 @@
 from fastapi import FastAPI
 
-from src.models import database
 from src.endpoints import router
 
 
@@ -14,12 +13,12 @@ app.include_router(router)
 
 @app.on_event("startup")
 async def startup():
-    await database.connect()
+    pass
 
 
 @app.on_event("shutdown")
 async def shutdown():
-    await database.disconnect()
+   pass
 
 
 if __name__ == '__main__':
