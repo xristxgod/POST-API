@@ -5,7 +5,7 @@ import sqlalchemy
 from sqlalchemy import Column, ForeignKey, orm
 from sqlalchemy.types import Integer, VARCHAR, Text, DateTime
 
-from .schemas import BodyUser, BodyPost, BodyComment
+from src.base.schemas import BodyUser, BodyCreateComment, BodyCreatePost
 from .base import CRUD
 from config import Config, logger
 
@@ -61,7 +61,7 @@ class PostModel(BaseModel, CRUD):
     posts = orm.relationship('CommentModel', backref='post', lazy=True)
 
     @staticmethod
-    def create(data: BodyPost) -> bool:
+    def create(data: BodyCreatePost) -> bool:
         """Create new post"""
         try:
             session.add(PostModel(
@@ -90,7 +90,7 @@ class CommentModel(BaseModel, CRUD):
     author_id = Column(Integer, ForeignKey("user_model.id", ondelete="SET NULL"))
 
     @staticmethod
-    def create(data: BodyComment) -> bool:
+    def create(data: BodyCreateComment) -> bool:
         """Create new comment"""
         try:
             session.add(CommentModel(
