@@ -32,7 +32,10 @@ class AutoHandler:
         if not payload:
             return False
         # {'userId': 12, 'createToken': '2022-08-03 10:06:57.502828', 'expireToken': '2022-08-05 10:06:57.502828'}
-        # if payload.get("userId")
+        try:
+            UserModel.read(payload.get("userId"))
+        except Exception:
+            return False
         return True
 
 
