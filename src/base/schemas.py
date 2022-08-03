@@ -112,7 +112,7 @@ class BodyCreateComment(BaseModel):
 
 
 class ResponseStatus(BaseModel):
-    status: bool = Field(description="Status")
+    status: bool = Field(description="Status", default=True)
 
     class Config:
         schema_extra = {
@@ -134,7 +134,7 @@ class ResponseLoginUser(BaseModel):
 
 
 class ResponseUser(BaseModel):
-    id: str = Field(description="User ID")
+    id: int = Field(description="User ID")
     username: str = Field(description="Username", max_length=50, min_length=4)
     password: str = Field(description="Password", max_length=50, min_length=8)
     firstName: Optional[str] = Field(description="First name", max_length=50, default=None)
@@ -153,7 +153,7 @@ class ResponseUser(BaseModel):
 
 
 class ResponseComment(BaseModel):
-    id: str = Field(description="Comment ID")
+    id: int = Field(description="Comment ID")
     text: str = Field(description="Comment text")
     parentId: Optional[int] = Field(description="ID of the person whose comment was answered!", default=None)
     postId: int = Field(description="Post id")
@@ -176,7 +176,7 @@ class ResponseComment(BaseModel):
 
 
 class ResponsePost(BaseModel):
-    id: str = Field(description="Post ID")
+    id: int = Field(description="Post ID")
     title: str = Field(description="Post title", max_length=50)
     text: str = Field(description="Post text")
     createAt: datetime = Field(description="Create time")

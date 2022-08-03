@@ -189,6 +189,7 @@ class CommentModel(BaseModel, CRUD):
                 author_id=data.authorId,
             ))
             session.commit()
+            return True
         except Exception as error:
             logger.error(f"{error}")
             session.rollback()
