@@ -1,0 +1,56 @@
+version: "3.9"
+
+services:
+  database:
+    container_name: database
+    image: postgres:13.3
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: posts
+    ports:
+      - "5432:5432"
+    expose:
+      - 5432
+    networks:
+      - api_network
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U root -d posts" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: always
+    volumes:
+      - ./config/db:/var/lib/postgresql/data
+    logging:
+      options:
+        max-size: 10m
+        max-file: "3"
+
+  api:
+    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: api
+    command: uvicorn app:app --host 0.0.0.0 --port 8080
+    volumes:
+      - ./files/logs/api:/home/app/files
+    env_file:
+      - .env
+    ports:
+      - "8080:8080"
+    expose:
+      - 8080
+    depends_on:
+      - database
+    networks:
+      - api_network
+    logging:
+      options:
+        max-size: 100m
+
+networks:
+  api_network:
+    driver: bridge
