@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Optional, Dict
 from datetime import datetime, timedelta
 
 import jwt
@@ -8,6 +8,31 @@ from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from .utils import utils
 from .models import UserModel
 from config import Config, logger
+
+
+class AuthRepository:
+    def __new__(cls):
+        if not hasattr(cls, 'instance'):
+            cls.instance = super(AuthRepository, cls).__new__(cls)
+        return cls.instance
+
+    def __init__(self):
+        self.users: Dict = {}
+
+    def add(self, user_id: int, token: str) -> Optional:
+        if not self.users.get(user_id):
+            self.users[user_id] = token
+        else:
+            if not AutoHandler.is_valid(self.users.get(user_id)):
+                self.users[user_id] = AutoHandler.sign_jwt_token(user_id)
+
+    def get(self, user_id: int) -> Optional[str]:
+        return self.users.get(user_id)
+
+    def delete(self, user_id: int) -> bool:
+        if self.users.get(user_id):
+            self.users.pop(user_id)
+        return True
 
 
 class AutoHandler:
@@ -31,14 +56,17 @@ class AutoHandler:
     def is_valid(token: str) -> bool:
         payload = AutoHandler.decode_jwt_token(token)
         if not payload:
-            return False
+            flag = False
         try:
             UserModel.read(payload.get("userId"))
         except Exception:
-            return False
+            flag = False
         if not utils.is_time(payload.get("expireToken")):
-            return False
-        return True
+            flag = False
+        flag = True
+        if not flag:
+            auth_repository.delete(payload.get("userId"))
+        return flag
 
 
 class JWTBearer(HTTPBearer):
@@ -55,3 +83,6 @@ class JWTBearer(HTTPBearer):
             return credentials.credentials
         else:
             raise HTTPException(status_code=403, detail="Invalid token!")
+
+
+auth_repository = AuthRepository()
