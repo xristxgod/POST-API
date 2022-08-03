@@ -1,5 +1,6 @@
 from datetime import datetime
 
+import fastapi
 import sqlalchemy
 from sqlalchemy import Column, ForeignKey, orm
 from sqlalchemy.types import Integer, VARCHAR, Text, DateTime
@@ -62,8 +63,8 @@ class UserModel(BaseModel, CRUD):
                 firstName=user.first_name,
                 lastName=user.last_name,
             )
-        except NotImplementedError as error:
-            raise ValueError("This user does not exist in the system.")
+        except NotImplementedError:
+            raise fastapi.HTTPException(detail="This user does not exist in the system.", status_code=404)
         except Exception as error:
             logger.error(f"{error}")
             raise ValueError("Is there something wrong!")
@@ -130,8 +131,8 @@ class PostModel(BaseModel, CRUD):
                     for comment in session.query(CommentModel).filter_by(post_id=post.id).all()
                 ]
             )
-        except NotImplementedError as error:
-            raise ValueError("This post was not found.")
+        except NotImplementedError:
+            raise fastapi.HTTPException(detail="This post was not found.", status_code=404)
         except Exception as error:
             logger.error(f"{error}")
             raise ValueError("Is there something wrong!")
@@ -151,8 +152,8 @@ class PostModel(BaseModel, CRUD):
             post.update_at = datetime.now()
             session.commit()
             return True
-        except NotImplementedError as error:
-            raise ValueError("This post was not found.")
+        except NotImplementedError:
+            raise fastapi.HTTPException(detail="This post was not found.", status_code=404)
         except Exception as error:
             logger.error(f"{error}")
             session.rollback()
@@ -211,7 +212,57 @@ class CommentModel(BaseModel, CRUD):
 
     @staticmethod
     def read(comment_id: int) -> ResponseComment:
-        pass
+        try:
+            comment: CommentModel = session.query(CommentModel).get(comment_id)
+            if not comment:
+                raise NotImplementedError
+            return ResponseComment(
+                id=comment.id,
+                text=comment.text,
+                parentId=comment.parent_id,
+                postId=comment.post_id,
+                createAt=comment.create_at,
+                updateAt=comment.update_at,
+                authorId=comment.author_id
+            )
+        except NotImplementedError:
+            raise fastapi.HTTPException(detail="This comment was not found!", status_code=404)
+        except Exception as error:
+            logger.error(f"{error}")
+            raise ValueError("Is there something wrong!")
+        finally:
+            session.close()
+
+    @staticmethod
+    def update(data: DataComment) -> bool:
+        try:
+            comment: CommentModel = session.query(CommentModel).get(data.commentId)
+            if not comment:
+                raise NotImplementedError
+            if data.text is not None:
+                comment.text = data.text
+            comment.update_at = datetime.now()
+            session.commit()
+            return True
+        except NotImplementedError:
+            raise fastapi.HTTPException(detail="This comment was not found.", status_code=404)
+        except Exception as error:
+            logger.error(f"{error}")
+            session.rollback()
+            return False
+        finally:
+            session.close()
+
+    @staticmethod
+    def delete(comment_id: int) -> bool:
+        try:
+            session.query(CommentModel).filter_by(id=comment_id).delete()
+            return True
+        except Exception as error:
+            logger.error(f"{error}")
+            return False
+        finally:
+            session.close()
 
 
 def create_db():

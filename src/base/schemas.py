@@ -10,14 +10,15 @@ from pydantic import BaseModel, Field, validator
 
 @dataclass()
 class DataPost:
+    postId: Optional[int] = field(default=None)
     title: Optional[str] = field(default=None)
     text: Optional[str] = field(default=None)
-    postId: Optional[int] = field(default=None)
     authorId: Optional[int] = field(default=None)
 
 
 @dataclass()
 class DataComment:
+    commentId: Optional[int] = field(default=None)
     text: Optional[str] = field(default=None)
     parentId: Optional[int] = field(default=None)
     postId: Optional[int] = field(default=None)
@@ -29,6 +30,10 @@ class DataComment:
 
 class QueryPost(BaseModel):
     postId: int = Field(description="Post id")
+
+
+class QueryComment(BaseModel):
+    commentId: int = Field(description="Post id")
 
 
 # <<<=======================================>>> Body <<<=============================================================>>>
@@ -95,8 +100,8 @@ class BodyModPost(BaseModel):
         }
 
 
-class BodyCreateComment(BaseModel):
-    text: str = Field(description="Comment text")
+class BodyModComment(BaseModel):
+    text: Optional[str] = Field(description="Comment text", default=None)
     parentId: Optional[int] = Field(description="ID of the person whose comment was answered!", default=None)
 
     class Config:
