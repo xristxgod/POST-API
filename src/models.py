@@ -7,7 +7,7 @@ from sqlalchemy.types import Integer, VARCHAR, Text, DateTime
 from src.base.schemas import (
     BodyCreateUser, ResponseUser,
     BodyCreateComment,
-    BodyCreatePost
+    DataCreatePost, ResponsePost
 )
 from .base import CRUD
 from config import Config, logger
@@ -78,12 +78,12 @@ class PostModel(BaseModel, CRUD):
     text = Column(Text, default="Not text")
     create_at = Column(DateTime, default=datetime.now(), nullable=True)
     update_at = Column(DateTime, default=datetime.now(), nullable=True)
-    author_id = Column(Integer, ForeignKey("user_model.id", ondelete="SET NULL"))
+    author_id = Column(Integer, ForeignKey("user_model.id", ondelete="SET NULL"), nullable=True, default=None)
 
     authors = orm.relationship("UserModel", foreign_keys="PostModel.author_id")
 
     @staticmethod
-    def create(data: BodyCreatePost) -> bool:
+    def create(data: DataCreatePost) -> bool:
         """Create new post"""
         try:
             session.add(PostModel(
@@ -92,10 +92,32 @@ class PostModel(BaseModel, CRUD):
                 author_id=data.authorId,
             ))
             session.commit()
+            return True
         except Exception as error:
             logger.error(f"{error}")
             session.rollback()
             return False
+        finally:
+            session.close()
+
+    @staticmethod
+    def read(post_id: int) -> ResponsePost:
+        try:
+            post: PostModel = session.query(PostModel).get(post_id)
+            if not post:
+                raise NotImplementedError
+            return ResponsePost(
+                title=post.title,
+                text=post.text,
+                createAt=post.create_at,
+                updateAt=post.update_at,
+                authorId=post.author_id,
+            )
+        except NotImplementedError as error:
+            raise ValueError("This post was not found.")
+        except Exception as error:
+            logger.error(f"{error}")
+            raise ValueError("Is there something wrong!")
         finally:
             session.close()
 

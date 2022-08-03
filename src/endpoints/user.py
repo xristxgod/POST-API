@@ -1,18 +1,17 @@
 from fastapi import APIRouter, Depends, Request, HTTPException
 
 from ..auth import JWTBearer, AutoHandler, auth_repository
-from ..base.schemas import BodyCreateUser, ResponseCreateUser, BodyLoginUser, ResponseLoginUser, ResponseUser
+from ..base.schemas import BodyCreateUser, ResponseStatus, BodyLoginUser, ResponseLoginUser, ResponseUser
 from ..models import UserModel, session
 
 
-router = APIRouter(
-    tags=["Authorization"]
-)
+router = APIRouter()
 
 
 @router.post(
     "/registration",
-    response_model=ResponseCreateUser
+    response_model=ResponseStatus,
+    tags=["Authorization"]
 )
 async def registration(body: BodyCreateUser):
     """
@@ -23,12 +22,13 @@ async def registration(body: BodyCreateUser):
     - **firstName**: first name (optional)
     - **lastName**: last name (optional)
     """
-    return ResponseCreateUser(status=UserModel.create(data=body))
+    return ResponseStatus(status=UserModel.create(data=body))
 
 
 @router.post(
     "/login",
-    response_model=ResponseLoginUser
+    response_model=ResponseLoginUser,
+    tags=["Authorization"]
 )
 async def login(body: BodyLoginUser):
     """
@@ -54,7 +54,8 @@ async def login(body: BodyLoginUser):
 @router.get(
     "/user/me",
     dependencies=[Depends(JWTBearer())],
-    response_model=ResponseUser
+    response_model=ResponseUser,
+    tags=["User"]
 )
 async def get_current_user(request: Request):
     """

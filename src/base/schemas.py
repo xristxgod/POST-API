@@ -1,7 +1,25 @@
 from typing import Optional
+from dataclasses import dataclass
 from datetime import datetime
 
 from pydantic import BaseModel, Field, validator
+
+
+# <<<=======================================>>> Dataclasses <<<======================================================>>>
+
+
+@dataclass()
+class DataCreatePost:
+    title: str
+    text: str
+    authorId: str
+
+
+# <<<=======================================>>> Query <<<============================================================>>>
+
+
+class QueryPost(BaseModel):
+    postId: int = Field(description="Post id")
 
 
 # <<<=======================================>>> Body <<<=============================================================>>>
@@ -49,22 +67,23 @@ class BodyLoginUser(BaseModel):
         }
 
 
-class BodyCreatePost(BaseModel):
+class BodyModPost(BaseModel):
     title: Optional[str] = Field(description="Post title", max_length=50, default=None)
     text: Optional[str] = Field(description="Post text", default=None)
-    authorId: int = Field(description="Post author")
-
-    @validator("authorId")
-    def valid_author_id(cls, author_id: int):
-        pass
 
     @validator("title")
     def valid_title_id(cls, title: str):
-        pass
+        if isinstance(title, str):
+            return title.title()
+        raise ValueError("Title must be a string!")
 
-    @validator("text")
-    def valid_text_id(cls, text: str):
-        pass
+    class Config:
+        schema_extra = {
+            "example": {
+                "title": "New PC",
+                "text": "This is my new pc and i love play video game! ...",
+            }
+        }
 
 
 class BodyCreateComment(BaseModel):
@@ -77,8 +96,8 @@ class BodyCreateComment(BaseModel):
 # <<<=======================================>>> Response <<<=========================================================>>>
 
 
-class ResponseCreateUser(BaseModel):
-    status: bool = Field(description="Status registration")
+class ResponseStatus(BaseModel):
+    status: bool = Field(description="Status")
 
     class Config:
         schema_extra = {
@@ -112,5 +131,24 @@ class ResponseUser(BaseModel):
                 "password": "0000",
                 "firstName": "Murad",
                 "lastName": "Mamedov",
+            }
+        }
+
+
+class ResponsePost(BaseModel):
+    title: str = Field(description="Post title", max_length=50)
+    text: str = Field(description="Post text")
+    createAt: datetime = Field(description="Create time")
+    updateAt: datetime = Field(description="Update time")
+    authorId: Optional[int] = Field(description="Author id", default=None)
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "title": "New PC",
+                "text": "This is my new pc and i love play video game! ...",
+                "createAt": "2022-08-03 14:34:07.613685",
+                "updateAt": "2022-08-03 14:34:07.613685",
+                "authorId": 666
             }
         }
