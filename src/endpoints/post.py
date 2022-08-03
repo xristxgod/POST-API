@@ -14,7 +14,30 @@ router = APIRouter(
 
 
 @router.get(
-    "/all",
+    "/user/all",
+    dependencies=[Depends(JWTBearer())],
+    response_model=List[ResponsePost]
+)
+async def get_all_posts_by_user_id(request: Request):
+    """
+    Get all post by user id
+    """
+    user_id = AutoHandler.decode_jwt_token(request.headers.get("Authorization").split(" ")[1])["userId"]
+    return [
+        ResponsePost(
+            id=post.id,
+            title=post.title,
+            text=post.text,
+            createAt=post.create_at,
+            updateAt=post.update_at,
+            authorId=post.author_id
+        )
+        for post in session.query(PostModel).filter_by(author_id=user_id).all()
+    ]
+
+
+@router.get(
+    "/all/",
     response_model=List[ResponsePost]
 )
 async def get_all_posts():
