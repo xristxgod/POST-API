@@ -4,7 +4,8 @@ from src.endpoints import router
 
 
 app = FastAPI(
-    description="",
+    title="Post API",
+    description="Work with posts and comments tree. How on: reddit.com",
     version="1.0.0"
 )
 
