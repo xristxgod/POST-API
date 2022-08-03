@@ -27,6 +27,9 @@ class UserModel(BaseModel, CRUD):
     first_name = Column(VARCHAR(50), nullable=True)
     last_name = Column(VARCHAR(50), nullable=True)
 
+    def __repr__(self):
+        return f"{self.username}"
+
     @staticmethod
     def create(data: BodyCreateUser) -> bool:
         """Create new user"""
