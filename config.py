@@ -13,6 +13,5 @@ logging.basicConfig(
 
 class Config:
     DATABASE_URL = os.getenv("DATABASE_URL", f"sqlite:///{os.path.join(ROOT_DIR, 'database.db')}")
-    JWT_NAME = os.getenv("JWT_NAME", "TEST-API")
     JWT_SECRET = os.getenv("JWT_SECRET", "fb68f4994e936dd60308")
     JWT_ALGORITHM = os.getenv("JWT_ALGORITHM", "HS256")
