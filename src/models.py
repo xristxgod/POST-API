@@ -1,11 +1,14 @@
 from datetime import datetime
 
-import databases
 import sqlalchemy
 from sqlalchemy import Column, ForeignKey, orm
 from sqlalchemy.types import Integer, VARCHAR, Text, DateTime
 
-from src.base.schemas import BodyCreateUser, BodyCreateComment, BodyCreatePost
+from src.base.schemas import (
+    BodyCreateUser, ResponseUser,
+    BodyCreateComment,
+    BodyCreatePost
+)
 from .base import CRUD
 from config import Config, logger
 
@@ -13,8 +16,6 @@ from config import Config, logger
 BaseModel = orm.declarative_base()
 engine = sqlalchemy.create_engine(Config.DATABASE_URL)
 session = orm.Session(engine)
-
-database = databases.Database(Config.DATABASE_URL)
 
 
 class UserModel(BaseModel, CRUD):
@@ -42,6 +43,26 @@ class UserModel(BaseModel, CRUD):
             logger.error(f"{error}")
             session.rollback()
             return False
+        finally:
+            session.close()
+
+    @staticmethod
+    def read(user_id: int) -> ResponseUser:
+        try:
+            user: UserModel = session.query(UserModel).get(user_id)
+            if not user:
+                raise NotImplementedError
+            return ResponseUser(
+                username=user.username,
+                password=user.password,
+                firstName=user.first_name,
+                lastName=user.last_name,
+            )
+        except NotImplementedError as error:
+            raise ValueError("This user does not exist in the system.")
+        except Exception as error:
+            logger.error(f"{error}")
+            raise ValueError("Is there something wrong!")
         finally:
             session.close()
 

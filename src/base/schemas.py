@@ -97,3 +97,20 @@ class ResponseLoginUser(BaseModel):
                 "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
             }
         }
+
+
+class ResponseUser(BaseModel):
+    username: str = Field(description="Username", max_length=50, min_length=4)
+    password: str = Field(description="Password", max_length=50, min_length=8)
+    firstName: Optional[str] = Field(description="First name", max_length=50, default=None)
+    lastName: Optional[str] = Field(description="Last name", max_length=50, default=None)
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "username": "root",
+                "password": "0000",
+                "firstName": "Murad",
+                "lastName": "Mamedov",
+            }
+        }
