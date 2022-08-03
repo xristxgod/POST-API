@@ -38,4 +38,8 @@ async def login(body: BodyLoginUser):
     """
 
 
-
+@router.post(
+    "/user/me"
+)
+async def get_current_user():
+    pass

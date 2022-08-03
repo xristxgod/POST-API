@@ -5,7 +5,7 @@ import sqlalchemy
 from sqlalchemy import Column, ForeignKey, orm
 from sqlalchemy.types import Integer, VARCHAR, Text, DateTime
 
-from src.base.schemas import BodyUser, BodyCreateComment, BodyCreatePost
+from src.base.schemas import BodyCreateUser, BodyCreateComment, BodyCreatePost
 from .base import CRUD
 from config import Config, logger
 

@@ -89,17 +89,11 @@ class ResponseCreateUser(BaseModel):
 
 
 class ResponseLoginUser(BaseModel):
-    successLogin: bool = Field()
-    username: str = Field()
-    token: str = Field()
-    expireToken: datetime = Field()
+    token: str = Field(description="Authorization token")
 
     class Config:
         schema_extra = {
             "example": {
-                "successLogin": True,
-                "username": "root",
-                "token": "EYwuqFJmFuuqZq6zpcb7PMah2SbKTMkY",
-                "expireToken": datetime.now()
+                "token": "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..."
             }
         }

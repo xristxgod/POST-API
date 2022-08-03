@@ -2,3 +2,4 @@ fastapi
 sqlalchemy
 databases
 uvicorn[standard]
+PyJWT
