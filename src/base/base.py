@@ -13,3 +13,7 @@ class CRUD:
     @staticmethod
     def update(data: object) -> bool:
         raise NotImplementedError
+
+    @staticmethod
+    def delete(**kwargs: Any) -> bool:
+        raise NotImplementedError
