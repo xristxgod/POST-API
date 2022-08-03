@@ -140,10 +140,13 @@ async def update_post(request: Request, body: BodyModPost, query: QueryPost = De
     dependencies=[Depends(JWTBearer())],
     response_model=ResponsePost
 )
-async def delete_post(query: QueryPost = Depends()):
+async def delete_post(request: Request, query: QueryPost = Depends()):
     """
     Delete post by id
 
     - **postId**: post id
     """
+    user_id = AutoHandler.decode_jwt_token(request.headers.get("Authorization").split(" ")[1])["userId"]
+    if PostModel.read(query.postId).authorId != user_id:
+        raise HTTPException(detail="You are not the owner of the post!", status_code=401)
     return PostModel.delete(query.postId)
