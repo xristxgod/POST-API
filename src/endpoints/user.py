@@ -1,6 +1,6 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Depends, Request, HTTPException
 
-from ..auth import AutoHandler, auth_repository
+from ..auth import JWTBearer, AutoHandler, auth_repository
 from ..base.schemas import BodyCreateUser, ResponseCreateUser, BodyLoginUser, ResponseLoginUser, ResponseUser
 from ..models import UserModel, session
 
@@ -53,7 +53,13 @@ async def login(body: BodyLoginUser):
 
 @router.get(
     "/user/me",
+    dependencies=[Depends(JWTBearer())],
     response_model=ResponseUser
 )
-async def get_current_user():
-    pass
+async def get_current_user(request: Request):
+    """
+    Get information about an authorized user
+    """
+    return UserModel.read(
+        AutoHandler.decode_jwt_token(request.headers.get("Authorization").split(" ")[1]).get("userId")
+    )
