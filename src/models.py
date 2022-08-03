@@ -7,7 +7,7 @@ from sqlalchemy.types import Integer, VARCHAR, Text, DateTime
 from src.base.schemas import (
     BodyCreateUser, ResponseUser,
     BodyCreateComment,
-    DataCreatePost, ResponsePost
+    DataPost, ResponsePost
 )
 from .base import CRUD
 from config import Config, logger
@@ -83,7 +83,7 @@ class PostModel(BaseModel, CRUD):
     authors = orm.relationship("UserModel", foreign_keys="PostModel.author_id")
 
     @staticmethod
-    def create(data: DataCreatePost) -> bool:
+    def create(data: DataPost) -> bool:
         """Create new post"""
         try:
             session.add(PostModel(
@@ -118,6 +118,39 @@ class PostModel(BaseModel, CRUD):
         except Exception as error:
             logger.error(f"{error}")
             raise ValueError("Is there something wrong!")
+        finally:
+            session.close()
+
+    @staticmethod
+    def update(data: DataPost) -> bool:
+        try:
+            post: PostModel = session.query(PostModel).get(data.postId)
+            if not post:
+                raise NotImplementedError
+            if data.text is not None:
+                post.text = data.text
+            if data.title is not None:
+                post.title = data.title
+            post.update_at = datetime.now()
+            session.commit()
+            return True
+        except NotImplementedError as error:
+            raise ValueError("This post was not found.")
+        except Exception as error:
+            logger.error(f"{error}")
+            session.rollback()
+            return False
+        finally:
+            session.close()
+
+    @staticmethod
+    def delete(post_id: int) -> bool:
+        try:
+            session.query(PostModel).filter_by(id=post_id).delete()
+            return True
+        except Exception as error:
+            logger.error(f"{error}")
+            return False
         finally:
             session.close()
 

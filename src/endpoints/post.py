@@ -1,14 +1,36 @@
-from fastapi import APIRouter, Depends, Request
+from typing import List
+
+from fastapi import APIRouter, Depends, Request, HTTPException
 
 from ..auth import JWTBearer, AutoHandler
-from ..models import PostModel
-from ..base.schemas import BodyModPost, DataCreatePost, QueryPost, ResponsePost, ResponseStatus
+from ..models import PostModel, session
+from ..base.schemas import BodyModPost, DataPost, QueryPost, ResponsePost, ResponseStatus
 
 
 router = APIRouter(
     prefix="/post",
     tags=["Post"]
 )
+
+
+@router.get(
+    "/all",
+    response_model=List[ResponsePost]
+)
+async def get_all_posts():
+    """
+    Get all posts
+    """
+    return [
+        ResponsePost(
+            title=post.title,
+            text=post.text,
+            createAt=post.create_at,
+            updateAt=post.update_at,
+            authorId=post.author_id
+        )
+        for post in session.query(PostModel).all()
+    ]
 
 
 @router.post(
@@ -23,10 +45,10 @@ async def create_post(request: Request, body: BodyModPost):
     - **title**: post title (optional)
     - **text**: post text (optional)
     """
-    return ResponseStatus(status=PostModel.create(data=DataCreatePost(
+    return ResponseStatus(status=PostModel.create(data=DataPost(
         title=body.title,
         text=body.text,
-        authorId=AutoHandler.decode_jwt_token(request.headers.get("Authorization").split(" ")[1]).get("userId")
+        authorId=AutoHandler.decode_jwt_token(request.headers.get("Authorization").split(" ")[1])["userId"]
     )))
 
 
@@ -55,6 +77,14 @@ async def update_post(request: Request, body: BodyModPost, query: QueryPost = De
     - **title**: post title (optional)
     - **text**: post text (optional)
     """
+    user_id = AutoHandler.decode_jwt_token(request.headers.get("Authorization").split(" ")[1])["userId"]
+    if PostModel.read(query.postId).authorId != user_id:
+        raise HTTPException(detail="You are not the owner of the post!", status_code=401)
+    return ResponseStatus(status=PostModel.update(data=DataPost(
+        title=body.title,
+        text=body.text,
+        postId=query.postId
+    )))
 
 
 @router.delete(
@@ -62,10 +92,10 @@ async def update_post(request: Request, body: BodyModPost, query: QueryPost = De
     dependencies=[Depends(JWTBearer())],
     response_model=ResponsePost
 )
-async def get_post(query: QueryPost = Depends()):
+async def delete_post(query: QueryPost = Depends()):
     """
     Delete post by id
 
     - **postId**: post id
     """
-    # return PostModel.read(query.postId)
+    return PostModel.delete(query.postId)

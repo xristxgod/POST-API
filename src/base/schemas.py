@@ -1,6 +1,6 @@
 from typing import Optional
-from dataclasses import dataclass
 from datetime import datetime
+from dataclasses import dataclass, field
 
 from pydantic import BaseModel, Field, validator
 
@@ -9,10 +9,11 @@ from pydantic import BaseModel, Field, validator
 
 
 @dataclass()
-class DataCreatePost:
-    title: str
-    text: str
-    authorId: str
+class DataPost:
+    authorId: Optional[int] = field(default=None)
+    title: Optional[str] = field(default=None)
+    text: Optional[str] = field(default=None)
+    postId: Optional[int] = field(default=None)
 
 
 # <<<=======================================>>> Query <<<============================================================>>>
