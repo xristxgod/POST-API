@@ -72,7 +72,7 @@ async def get_current_user(request: Request):
     response_model=ResponseStatus,
     tags=["User"]
 )
-async def update_user(request: Request, body=BodyModUser):
+async def update_user(request: Request, body: BodyModUser):
     """
     Update user info
 
@@ -99,10 +99,8 @@ async def update_user(request: Request, body=BodyModUser):
 async def delete_user(request: Request):
     """
     Delete user by id
-    :param request:
-    :return:
     """
     user_id = AutoHandler.decode_jwt_token(request.headers.get("Authorization").split(" ")[1])["userId"]
-    status = ResponseStatus(status=UserModel.delete(user_id=user_id,))
+    status = ResponseStatus(status=UserModel.delete(user_id=user_id))
     auth_repository.delete(user_id)
     return status
