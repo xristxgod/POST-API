@@ -22,12 +22,14 @@ Work with posts and comments tree. How on: reddit.com
 
 ## How to run:
 > ```shell
-> # Create db
-> python create_db.py
 > # Run
 > docker-compose -f docker-compose.yml up --build
 > # Stop
 > docker-compose -f docker-compose.yml stop
+> # Create db
+> docker exec -it api /bin/bash
+> ... python create_db.py
+> ... Create is success!
 > ```
 
 
