@@ -1,14 +1,13 @@
-from typing import Dict
-
 import pydantic
-from tortoise import models
+import tortoise.models as models
 
 
 class MiddlewareUtils:
     @staticmethod
-    async def middleware(body: pydantic.BaseModel, **fields: Dict[str: models.MODEL]) -> pydantic.BaseModel:
+    async def middleware(body: pydantic.BaseModel, **fields) -> pydantic.BaseModel:
         # user=None - del body.user || post=Post - Post.get(id=post)
         for name, model in fields.items():
+            model: models.MODEL
             if model is None:
                 delattr(body, name)
             else:
