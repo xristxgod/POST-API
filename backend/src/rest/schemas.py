@@ -47,6 +47,10 @@ class ModPost(BaseModel):
         }
 
 
+class ModComment(BaseModel):
+    pass
+
+
 class ResponseSuccessfully(BaseModel):
     successfully: bool = Field(default=True)
 

@@ -21,6 +21,6 @@ async def get_manager() -> Type[Manager]:
 
 __all__ = [
     'CommentManager',
-    'Comment',
+    'CommentBody',
     'get_manager'
 ]

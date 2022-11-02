@@ -1,4 +1,4 @@
-from typing import Union, Optional, List
+from typing import List
 
 from tortoise.contrib.fastapi import HTTPNotFoundError
 from fastapi import APIRouter, Depends, UploadFile, File
@@ -7,7 +7,7 @@ from fastapi.responses import StreamingResponse
 from src.db.models import User
 from src.db import Manager, get_user_manager
 from src.db.managers.user import UserBody
-from src.rest.schemas import ModUser, ResponseSuccessfully, ResponseMessage
+from src.rest.schemas import ModUser, ResponseSuccessfully
 from src.utils import CustomResponses
 
 
