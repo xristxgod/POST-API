@@ -48,7 +48,23 @@ class ModPost(BaseModel):
 
 
 class ModComment(BaseModel):
-    pass
+    text: Optional[constr(max_length=255, min_length=5)]
+    post: Optional[int] = Field(alias='postId')
+    user: Optional[int] = Field(alias='userId')
+
+    @validator('text')
+    def valid_text(cls, text: str):
+        ...
+        return text
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "text": "This is the primary way of converting a model to a dictionary. Sub-models will be recursively",
+                "postId": 12,
+                "userId": 12
+            }
+        }
 
 
 class ResponseSuccessfully(BaseModel):

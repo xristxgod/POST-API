@@ -1,29 +1,7 @@
-import enum
-
 import tortoise
 from tortoise import models, fields
 
 from src.utils import Password
-
-
-class ItemNameEnum(enum.Enum):
-    USER = 'user'
-    POST = 'post'
-    COMMENT = 'comment'
-
-
-class Like(models.Model):
-    id = fields.IntField(pk=True)
-
-    # True - like | False - dislike
-    rating = fields.BooleanField()
-
-    user = fields.ForeignKeyField('models.User', related_name='likes', null=True, on_delete=fields.SET_NULL)
-    itme_name = fields.CharEnumField(enum_type=ItemNameEnum)
-    item_id = fields.IntField()
-
-    created = fields.DatetimeField(auto_now_add=True)
-    updated = fields.DatetimeField(auto_now=True)
 
 
 class PostImage(models.Model):
