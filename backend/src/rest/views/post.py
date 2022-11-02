@@ -51,7 +51,9 @@ async def delete_user(post_id: int, db: Manager = Depends(get_post_manager)):
     return ResponseSuccessfully()
 
 
-@router.patch('/{post_id}/images', response_model=ResponseSuccessfully, responses={404: {"model": HTTPNotFoundError}})
+@image_router.patch(
+    '/{post_id}/images', response_model=ResponseSuccessfully, responses={404: {"model": HTTPNotFoundError}}
+)
 async def add_images(post_id: int, images: List[UploadFile] = File(default=None)):
     async with in_transaction():
         await PostImage.create(main=True, image=images[0], post=post_id)
@@ -64,7 +66,7 @@ async def add_images(post_id: int, images: List[UploadFile] = File(default=None)
     return ResponseSuccessfully()
 
 
-@router.get(
+@image_router.get(
     '/{post_id}/images', response_class=StreamingResponse,
     responses={404: {"model": HTTPNotFoundError}}
 )
@@ -73,7 +75,7 @@ async def get_all_images(post_id: int):
     return CustomResponses.image_response([image.image for image in images])
 
 
-@router.get(
+@image_router.get(
     '/{post_id}/images/{image_id}?main={main}', response_class=StreamingResponse,
     responses={404: {"model": HTTPNotFoundError}}
 )
@@ -82,7 +84,7 @@ async def get_image(post_id: int, image_id: int, main: bool = False):
     return CustomResponses.image_response(image.image)
 
 
-@router.delete(
+@image_router.delete(
     '/{post_id}/images/{image_id}', response_model=ResponseSuccessfully,
     responses={404: {"model": HTTPNotFoundError}}
 )
@@ -95,3 +97,8 @@ async def get_image(post_id: int, image_id: int):
         await image.delete()
         await image.save()
     return ResponseSuccessfully()
+
+
+__all__ = [
+    'router', 'image_router'
+]
