@@ -5,7 +5,7 @@ from tortoise.transactions import in_transaction
 from fastapi import APIRouter, Depends, UploadFile, File
 from fastapi.responses import StreamingResponse
 
-from src.db.models import PostImage
+from src.db.models import PostImage, User
 from src.db.utils import MiddlewareUtils
 from src.db import Manager, get_post_manager
 from src.db.managers.post import PostBody
@@ -19,7 +19,7 @@ image_router = APIRouter()
 
 @router.post('/', response_model=PostBody)
 async def add_post(body: ModPost, db: Manager = Depends(get_post_manager)):
-    return await db.add(body=await MiddlewareUtils.user_middleware(body=body))
+    return await db.add(body=await MiddlewareUtils.middleware(body=body, user=User))
 
 
 @router.get('/all', response_model=List[PostBody])
@@ -34,7 +34,7 @@ async def get_user(post_id: int, db: Manager = Depends(get_post_manager)):
 
 @router.put('/{post_id}', response_model=ResponseSuccessfully, responses={404: {"model": HTTPNotFoundError}})
 async def update_user(body: ModPost, post_id: int, db: Manager = Depends(get_post_manager)):
-    await db.update(post_id, body=await MiddlewareUtils.user_middleware(body=body, update=True))
+    await db.update(post_id, body=await MiddlewareUtils.middleware(body=body, user=None))
     return ResponseSuccessfully()
 
 
