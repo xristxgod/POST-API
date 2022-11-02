@@ -58,8 +58,8 @@ class ModComment(BaseModel):
         ...
         return text
 
-    @validator('subComment')
-    def valid_sub_comment(self, sub_comment: int):
+    @validator('subComment', check_fields=False)
+    def valid_sub_comment(cls, sub_comment: int):
         # user != sub_comment
         ...
         return sub_comment
