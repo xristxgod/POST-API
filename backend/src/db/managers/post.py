@@ -1,4 +1,4 @@
-from typing import NoReturn, Type, List
+from typing import Type, List
 
 from tortoise.contrib.pydantic import pydantic_model_creator
 
