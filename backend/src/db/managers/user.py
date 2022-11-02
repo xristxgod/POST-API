@@ -1,4 +1,4 @@
-from typing import Type, List
+from typing import Type
 
 from tortoise.contrib.pydantic import pydantic_model_creator
 
@@ -14,31 +14,18 @@ UserBody = pydantic_model_creator(User, name='User')
 
 class UserManager(Manager, metaclass=src.Singleton):
     model = User
+    response = UserBody
 
     @classmethod
     async def add(cls, body: ModUser) -> UserBody:
-        user = await cls.model.get_or_create(
+        user = (await cls.model.get_or_create(
             username=body.username,
             defaults={
                 'password_hash': Password.hash(body.password_hash),
                 'active': body.active
             }
-        )
-        return await UserBody.from_tortoise_orm(user[0])
-
-    @classmethod
-    async def all(cls) -> List[UserBody]:
-        return await UserBody.from_queryset(cls.model.all())
-
-    @classmethod
-    async def get(cls, _id: int) -> UserBody:
-        return await UserBody.from_queryset_single(cls.model.get(id=_id))
-
-    @classmethod
-    async def update(cls, _id: int, body: ModUser) -> UserBody:
-        return await UserBody.from_tortoise_orm(
-            await super(UserManager, cls).update(_id=_id, body=body)
-        )
+        ))[0]
+        return await UserBody.from_tortoise_orm(user)
 
 
 async def get_manager() -> Type[Manager]:
