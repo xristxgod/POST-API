@@ -51,11 +51,18 @@ class ModComment(BaseModel):
     text: Optional[constr(max_length=255, min_length=5)]
     post: Optional[int] = Field(alias='postId')
     user: Optional[int] = Field(alias='userId')
+    sub_comment: Optional[int] = Field(alias='subComment')
 
     @validator('text')
     def valid_text(cls, text: str):
         ...
         return text
+
+    @validator('subComment')
+    def valid_sub_comment(self, sub_comment: int):
+        # user != sub_comment
+        ...
+        return sub_comment
 
     class Config:
         schema_extra = {

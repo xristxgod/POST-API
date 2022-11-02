@@ -12,7 +12,7 @@ CommentBody = pydantic_model_creator(Comment, name="Post")
 
 class CommentManager(Manager, metaclass=src.Singleton):
     model = Comment
-    body = CommentBody
+    response = CommentBody
 
 
 async def get_manager() -> Type[Manager]:
