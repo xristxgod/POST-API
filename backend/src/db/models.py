@@ -32,7 +32,6 @@ class User(models.Model):
 
     posts: fields.ReverseRelation['Post']
     user_comments: fields.ReverseRelation['Comment']
-    likes: fields.ReverseRelation['Like']
 
     @property
     def password(self) -> str:
