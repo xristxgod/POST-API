@@ -3,6 +3,7 @@ from typing import Union, List
 
 import bcrypt
 from fastapi.responses import StreamingResponse
+from fastapi import HTTPException, status
 
 
 class Password:
@@ -19,9 +20,8 @@ class Password:
 class CustomResponses:
 
     @staticmethod
-    def image_response(img: Union[List[bytes], bytes]) -> Union[List[StreamingResponse], StreamingResponse]:
-        if isinstance(img, bytes):
-            return StreamingResponse(io.BytesIO(img), media_type="image/png")
-
-        for image in img:
-            yield StreamingResponse(io.BytesIO(image), media_type="image/png")
+    def images_response(img: bytes) -> StreamingResponse:
+        try:
+            return StreamingResponse(io.BytesIO(img), media_type='image/png')
+        except TypeError:
+            raise HTTPException(detail='Not found', status_code=status.HTTP_404_NOT_FOUND)
