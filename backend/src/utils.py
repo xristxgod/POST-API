@@ -20,8 +20,7 @@ class Password:
 
 
 class Default:
-
     @staticmethod
-    def default_image() -> io.BytesIO:
+    async def default_image() -> io.BytesIO:
         async with aiofiles.open(os.path.join(settings.DEFAULT_DIR, 'no-photos.png'), 'rb') as raw_avatar:
             return io.BytesIO(await raw_avatar.read())

@@ -15,8 +15,8 @@ class PostManager(Manager, metaclass=src.Singleton):
     response = PostBody
 
 
-async def get_manager() -> Type[Manager]:
-    return PostManager
+async def get_manager() -> Manager:
+    return PostManager()
 
 
 __all__ = [

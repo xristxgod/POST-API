@@ -15,8 +15,8 @@ class CommentManager(Manager, metaclass=src.Singleton):
     response = CommentBody
 
 
-async def get_manager() -> Type[Manager]:
-    return CommentManager
+async def get_manager() -> Manager:
+    return CommentManager()
 
 
 __all__ = [

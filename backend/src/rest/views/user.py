@@ -1,22 +1,14 @@
-import os
-import io
 from typing import List
 
-import aiofiles
 from tortoise.contrib.fastapi import HTTPNotFoundError
-from fastapi import APIRouter, Depends, UploadFile, File
-from fastapi.responses import StreamingResponse
+from fastapi import APIRouter, Depends
 
-import src.settings as settings
-from src.db.models import User
 from src.db import Manager, get_user_manager
 from src.db.managers.user import UserBody
 from src.rest.schemas import ModUser, ResponseSuccessfully
-from src.utils import Default
 
 
 router = APIRouter()
-avatar_router = APIRouter()
 
 
 @router.post('/', response_model=UserBody)
@@ -48,41 +40,6 @@ async def delete_user(user_id: int, db: Manager = Depends(get_user_manager)):
     return ResponseSuccessfully()
 
 
-# <<<================================================================================================================>>>
-
-
-@avatar_router.put(
-    '/{user_id}/avatar', response_model=ResponseSuccessfully,
-    responses={404: {"model": HTTPNotFoundError}}
-)
-async def add_avatar(user_id: int, avatar: UploadFile = File(default=None)):
-    user = await User.get(id=user_id)
-    await user.update_from_dict({'avatar': await avatar.read()}).save()
-    return ResponseSuccessfully()
-
-
-@avatar_router.delete(
-    '/{user_id}/avatar', response_model=ResponseSuccessfully,
-    responses={404: {"model": HTTPNotFoundError}}
-)
-async def delete_avatar(user_id: int):
-    user = await User.get(id=user_id)
-    await user.update_from_dict({'avatar': None}).save()
-    return ResponseSuccessfully()
-
-
-@avatar_router.get(
-    '/{user_id}/avatar', response_class=StreamingResponse,
-    responses={404: {"model": HTTPNotFoundError}}
-)
-async def get_avatar(user_id: int):
-    user = await User.filter(id=user_id).first()
-    return StreamingResponse(
-        io.BytesIO(user.avatar) if user.avatar is not None else Default.default_image(),
-        media_type='image/png'
-    )
-
-
 __all__ = [
-    'router', 'avatar_router'
+    'router'
 ]

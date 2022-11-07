@@ -28,8 +28,8 @@ class UserManager(Manager, metaclass=src.Singleton):
         return await UserBody.from_tortoise_orm(user)
 
 
-async def get_manager() -> Type[Manager]:
-    return UserManager
+async def get_manager() -> Manager:
+    return UserManager()
 
 
 __all__ = [
