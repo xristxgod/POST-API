@@ -3,6 +3,7 @@ import fastapi
 from fastapi.middleware.cors import CORSMiddleware
 from tortoise.contrib.fastapi import register_tortoise
 
+import src.rest.schemas as schemas
 from src.rest.views import api
 
 
@@ -33,6 +34,11 @@ async def startup():
 @app.on_event("shutdown")
 async def shutdown():
     await tortoise.Tortoise.close_connections()
+
+
+@app.get("/", response_model=schemas.ResponseSuccessfully, tags=["SYSTEM"])
+async def status():
+    return schemas.ResponseSuccessfully()
 
 
 if __name__ == '__main__':
