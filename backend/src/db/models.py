@@ -38,21 +38,14 @@ class Image(models.Model):
     )
 
     def __str__(self):
-        text = ['Image']
-        if self.post is not None:
-            text.append(f'Post#{self.post.pk}')
-        if self.user is not None:
-            text.append(f'User#{self.user.pk}')
-        if self.comment is not None:
-            text.append(f'Comment#{self.comment.pk}')
-        return '::' + '::'.join(text) + '::'
+        return f'Image: {self.id}'
 
     class Meta:
         ordering = ('main',)
 
     class PydanticMeta:
         exclude = (
-            'image'
+            'image',
         )
 
 
@@ -133,15 +126,17 @@ class Comment(models.Model):
     comment_images: fields.ReverseRelation['Image']
 
     def __str__(self):
-        return f'Post: {self.post} From user: {self.user} To: {self.reply_to_comment.user}'
+        return f'Comment: {self.id}'
 
     class PydanticMeta:
-        exclude = (
-            'post.post_comments',
-            'user.user_comments',
-            'reply_to_comment',
-            'comments'
-        )
+        # exclude = (
+        #     'post',
+        #     # 'post.post_comments',
+        #     # 'user.user_comments',
+        #     # 'reply_to_comment',
+        #     # 'comments'
+        # )
+        pass
 
 
 tortoise.Tortoise.init_models(["src.db.models"], "models")
