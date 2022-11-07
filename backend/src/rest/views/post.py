@@ -28,18 +28,18 @@ async def get_all_post(db: Manager = Depends(get_post_manager)):
 
 
 @router.get('/{post_id}', response_model=PostBody, responses={404: {"model": HTTPNotFoundError}})
-async def get_user(post_id: int, db: Manager = Depends(get_post_manager)):
+async def get_post(post_id: int, db: Manager = Depends(get_post_manager)):
     return await db.get(post_id)
 
 
 @router.put('/{post_id}', response_model=ResponseSuccessfully, responses={404: {"model": HTTPNotFoundError}})
-async def update_user(body: ModPost, post_id: int, db: Manager = Depends(get_post_manager)):
+async def update_post(body: ModPost, post_id: int, db: Manager = Depends(get_post_manager)):
     await db.update(post_id, body=await MiddlewareUtils.middleware(body=body, user=None))
     return ResponseSuccessfully()
 
 
 @router.delete('/{post_id}', response_model=ResponseSuccessfully, responses={404: {"model": HTTPNotFoundError}})
-async def delete_user(post_id: int, db: Manager = Depends(get_post_manager)):
+async def delete_post(post_id: int, db: Manager = Depends(get_post_manager)):
     await db.delete(post_id)
     return ResponseSuccessfully()
 
