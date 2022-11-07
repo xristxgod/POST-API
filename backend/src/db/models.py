@@ -105,16 +105,17 @@ class Comment(models.Model):
 
     post = fields.ForeignKeyField('models.Post', related_name='post_comments', on_delete=fields.CASCADE)
     user = fields.ForeignKeyField('models.User', related_name='user_comments', null=True, on_delete=fields.SET_NULL)
-    reply_to_comment = fields.ForeignKeyField('models.Comment', null=True, on_delete=fields.SET_NULL)
+    reply_to_comment = fields.ForeignKeyField('models.Comment', default=None, null=True, on_delete=fields.SET_NULL)
 
     def __str__(self):
-        return f'Post: {self.post} From user: {self.user} To: {self.s}'
+        return f'Post: {self.post} From user: {self.user} To: {self.reply_to_comment.user}'
 
     class PydanticMeta:
         exclude = (
             'post.post_comments',
             'user.user_comments',
-            'reply_to_comment'
+            'reply_to_comment',
+            'comments'
         )
 
 
