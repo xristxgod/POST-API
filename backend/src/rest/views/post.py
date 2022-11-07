@@ -1,16 +1,20 @@
+import os
+import io
 from typing import List
 
+import aiofiles
 from tortoise.contrib.fastapi import HTTPNotFoundError
 from tortoise.transactions import in_transaction
 from fastapi import APIRouter, Depends, UploadFile, File
 from fastapi.responses import StreamingResponse
 
+import src.settings as settings
 from src.db.models import PostImage, User
 from src.db.utils import MiddlewareUtils
 from src.db import Manager, get_post_manager
 from src.db.managers.post import PostBody
 from src.rest.schemas import ModPost, ResponseSuccessfully
-from src.utils import CustomResponses
+from src.utils import Default
 
 
 router = APIRouter()
@@ -44,37 +48,41 @@ async def delete_post(post_id: int, db: Manager = Depends(get_post_manager)):
     return ResponseSuccessfully()
 
 
+# <<<================================================================================================================>>>
+
+
 @image_router.patch(
     '/{post_id}/images', response_model=ResponseSuccessfully, responses={404: {"model": HTTPNotFoundError}}
 )
 async def add_images(post_id: int, images: List[UploadFile] = File(default=None)):
     async with in_transaction():
-        await PostImage.create(main=True, image=images[0], post=post_id)
-        if len(images) > 1:
-            for image in images[1:]:
-                await PostImage.create(
-                    image=image,
-                    post=post_id
-                )
+        # first photo is a main
+        await PostImage.create(main=True, image=await images.pop().read())
+        if len(images) > 0:
+            for image in images:
+                await PostImage.create(image=image, post=post_id)
     return ResponseSuccessfully()
 
 
 @image_router.get(
-    '/{post_id}/images', response_class=StreamingResponse,
+    '/{post_id}/images/all', response_class=StreamingResponse,
     responses={404: {"model": HTTPNotFoundError}}
 )
 async def get_all_images(post_id: int):
-    images = await PostImage.filter(post=post_id).all()
-    return CustomResponses.image_response([image.image for image in images])
+    # images = await PostImage.filter(post=post_id).all()
+    pass
 
 
 @image_router.get(
-    '/{post_id}/images/{image_id}?main={main}', response_class=StreamingResponse,
+    '/{post_id}/images/main', response_class=StreamingResponse,
     responses={404: {"model": HTTPNotFoundError}}
 )
-async def get_image(post_id: int, image_id: int, main: bool = False):
-    image = await PostImage.filter(id=image_id, post=post_id, main=main).first()
-    return CustomResponses.image_response(image.image)
+async def get_main_photo(post_id: int):
+    image = await PostImage.filter(post=post_id, main=True).first()
+    return StreamingResponse(
+        io.BytesIO(image.image) if image.image is not None else Default.default_image(),
+        media_type='image/png'
+    )
 
 
 @image_router.delete(

@@ -1,9 +1,11 @@
+import os
 import io
 from typing import Union, List
 
 import bcrypt
-from fastapi.responses import StreamingResponse
-from fastapi import HTTPException, status
+import aiofiles
+
+import src.settings as settings
 
 
 class Password:
@@ -17,11 +19,9 @@ class Password:
         return bcrypt.checkpw(password.encode(), password_hash.encode())
 
 
-class CustomResponses:
+class Default:
 
     @staticmethod
-    def images_response(img: bytes) -> StreamingResponse:
-        try:
-            return StreamingResponse(io.BytesIO(img), media_type='image/png')
-        except TypeError:
-            raise HTTPException(detail='Not found', status_code=status.HTTP_404_NOT_FOUND)
+    def default_image() -> io.BytesIO:
+        async with aiofiles.open(os.path.join(settings.DEFAULT_DIR, 'no-photos.png'), 'rb') as raw_avatar:
+            return io.BytesIO(await raw_avatar.read())

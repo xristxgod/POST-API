@@ -12,6 +12,7 @@ from src.db.models import User
 from src.db import Manager, get_user_manager
 from src.db.managers.user import UserBody
 from src.rest.schemas import ModUser, ResponseSuccessfully
+from src.utils import Default
 
 
 router = APIRouter()
@@ -47,6 +48,9 @@ async def delete_user(user_id: int, db: Manager = Depends(get_user_manager)):
     return ResponseSuccessfully()
 
 
+# <<<================================================================================================================>>>
+
+
 @avatar_router.put(
     '/{user_id}/avatar', response_model=ResponseSuccessfully,
     responses={404: {"model": HTTPNotFoundError}}
@@ -73,12 +77,10 @@ async def delete_avatar(user_id: int):
 )
 async def get_avatar(user_id: int):
     user = await User.filter(id=user_id).first()
-    if user.avatar is not None:
-        avatar = io.BytesIO(user.avatar)
-    else:
-        async with aiofiles.open(os.path.join(settings.DEFAULT_DIR, 'no-photos.png'), 'rb') as raw_avatar:
-            avatar = io.BytesIO(await raw_avatar.read())
-    return StreamingResponse(avatar, media_type='image/png')
+    return StreamingResponse(
+        io.BytesIO(user.avatar) if user.avatar is not None else Default.default_image(),
+        media_type='image/png'
+    )
 
 
 __all__ = [
