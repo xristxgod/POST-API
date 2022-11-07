@@ -26,7 +26,7 @@ class Manager:
     async def update(cls, _id: int, body: BaseModel) -> main.ModelMetaclass:
         item = await cls.model.get(id=_id)
         await item.update_from_dict(body.dict(exclude_unset=True, exclude_defaults=True)).save()
-        return cls.response.from_tortoise_orm(item)
+        return await cls.response.from_tortoise_orm(item)
 
     @classmethod
     async def delete(cls, _id: int) -> NoReturn:
