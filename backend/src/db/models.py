@@ -67,7 +67,7 @@ class Post(models.Model):
     images: fields.ReverseRelation['PostImage']
 
     class PydanticMeta:
-        exclude = ['images']
+        exclude = ['images', 'user.user_comments']
 
 
 class Comment(models.Model):
