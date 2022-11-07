@@ -82,5 +82,8 @@ class Comment(models.Model):
     user = fields.ForeignKeyField('models.User', related_name='user_comments', null=True, on_delete=fields.SET_NULL)
     sub_comment = fields.ForeignKeyField('models.Comment', null=True, on_delete=fields.SET_NULL)
 
+    class PydanticMeta:
+        exclude = ['post', 'user', 'sub_comment', 'comments']
+
 
 tortoise.Tortoise.init_models(["src.db.models"], "models")
