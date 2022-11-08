@@ -29,8 +29,9 @@ class ImageController:
 
     @classmethod
     async def add(cls, item_type: ImageTypeEnum, item_id: int, images: List[UploadFile]) -> ResponseSuccessfully:
-        params = {item_type: item_id}
-        list_images = cls.model.filter(**params)
+        params = {item_type.value: item_id}
+        print(params)
+        list_images = await cls.model.filter(**params)
         # To many image in database
         count_images = len(list_images)
         cls.check_count(count_images)
@@ -38,7 +39,8 @@ class ImageController:
             if len(list_images) == 0:
                 # Set main photo
                 main_image = images.pop()
-                await cls.model.create(main=True, image=await main_image.read(), **params)
+                print(params)
+                await cls.model.create(image=await main_image.read(), main=True, **params)
             for image in images:
                 await cls.model.create(image=await image.read(), **params)
                 count_images += 1

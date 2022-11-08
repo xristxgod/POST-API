@@ -3,6 +3,19 @@ from typing import Optional
 from pydantic import BaseModel, Field, validator, constr
 
 
+class AuthenticationBody(BaseModel):
+    username: Optional[constr(max_length=255, min_length=5)]
+    password: Optional[constr(max_length=255, min_length=5)]
+
+    class Config:
+        schema_extra = {
+            "example": {
+                "username": "@muro.bodriy",
+                "password": "12341fvasd231"
+            }
+        }
+
+
 class ModUser(BaseModel):
     username: Optional[constr(max_length=255, min_length=5)]
     password_hash: Optional[constr(max_length=255, min_length=5)] = Field(alias='password')
