@@ -1,6 +1,8 @@
 from typing import NoReturn, List
 
 from pydantic import BaseModel
+from motor import MotorCollection
+import pymongo.errors as mongo_ex
 
 from src.db.mongo import core
 from src.db.base import OID
@@ -9,6 +11,7 @@ from src.db.base import OID
 class Manager:
 
     model: BaseModel
+    response: BaseModel
     collection_name: str
 
     __slots__ = (
@@ -17,9 +20,16 @@ class Manager:
 
     def __init__(self):
         self.core = core
-        self.collection = getattr(self.core.db, self.collection_name)
+        self.collection: MotorCollection = getattr(self.core.db, self.collection_name)
 
-    async def add(self, body: BaseModel) -> BaseModel: ...
+    async def set_index(self):
+        raise NotImplemented
+
+    async def add(self, body: BaseModel) -> BaseModel:
+        item = await self.collection.insert_one(
+            body.dict(exclude=("id",))
+        )
+        return self.response(**item)
 
     async def all(self) -> List[BaseModel]: ...
 
