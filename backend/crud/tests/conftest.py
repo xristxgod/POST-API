@@ -1,6 +1,7 @@
 import logging
 
 import pytest
+import pytest_asyncio
 from httpx import AsyncClient
 from tortoise import Tortoise
 
@@ -14,7 +15,6 @@ SETTINGS = get_settings()
 @pytest.fixture(scope="session")
 async def client():
     async with AsyncClient(app=main.app, base_url="http://test") as client:
-        print("Client is ready")
         yield client
 
 

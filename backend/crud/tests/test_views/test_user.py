@@ -1,22 +1,26 @@
-import logging
-
 import pytest
 from httpx import AsyncClient
 
 from src.db.models import User
+import main
 
-
-# @pytest.mark.anyio
-# class TestUserView:
+# @pytest.mark.asyncio
+# class TestView:
 #
+#     model = User
 #     endpoint = '/api/users'
 #
 #     async def test_get_users(self, client: AsyncClient):
-#         name, age = ["sam", 99]
-#         assert await User.filter(username=name).count() == 0
+#         result = await client.get(
+#             self.endpoint + '/all'
+#         )
+#         assert await result.json() == []
 
-@pytest.mark.asyncio
-async def test_get_users(client: AsyncClient):
-    # u1 = await User.all().first()
-    # users = await User.all()
-    print('s')
+
+@pytest.mark.anyio
+async def test_client():
+    async with AsyncClient(app=main.app, base_url="http://test") as client:
+        res = await client.get('/')
+
+    assert res.statuse_code == 200
+    assert res.statuse_code != 200
