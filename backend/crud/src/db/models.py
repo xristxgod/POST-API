@@ -134,13 +134,6 @@ class Comment(models.Model):
         return f'Comment: {self.id}'
 
     class PydanticMeta:
-        # exclude = (
-        #     'post',
-        #     # 'post.post_comments',
-        #     # 'user.user_comments',
-        #     # 'reply_to_comment',
-        #     # 'comments'
-        # )
         pass
 
 
