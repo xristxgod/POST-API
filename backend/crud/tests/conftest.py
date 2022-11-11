@@ -1,7 +1,4 @@
-import logging
-
 import pytest
-import pytest_asyncio
 from httpx import AsyncClient
 from tortoise import Tortoise
 
@@ -13,6 +10,11 @@ SETTINGS = get_settings()
 
 
 @pytest.fixture(scope="session")
+def anyio_backend():
+    return "asyncio"
+
+
+@pytest.fixture(scope="session")
 async def client():
     async with AsyncClient(app=main.app, base_url="http://test") as client:
         yield client
@@ -21,7 +23,7 @@ async def client():
 @pytest.fixture(scope="session", autouse=True)
 async def initialize_tests():
     await Tortoise.init(
-        db_url=SETTINGS.db_pat,
+        db_url=SETTINGS.db_path,
         modules={'models': ['src.db.models']},
         _create_db=True
     )
