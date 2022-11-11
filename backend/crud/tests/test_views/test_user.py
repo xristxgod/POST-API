@@ -14,6 +14,16 @@ class TestView:
     model = User
     endpoint = '/api/users'
 
+    # @pytest.mark.parametrize()
+    async def test_create_user(self, client: AsyncClient):
+        data = dict(username='@test-testov', password='2412455xfasd231')
+
+        response = await client.post(self.endpoint, data=data)
+
+        assert response.status_code == 200
+        assert response.json()['username'] == data['username']
+        assert response.json()['active'] is True
+
     async def test_get_user(self, client: AsyncClient, fake_user: Callable):
         user = await fake_user()
 
