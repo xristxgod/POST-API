@@ -27,7 +27,7 @@ class Post(models.Model):
     created = models.DateTimeField(_('Дата создания'), auto_now_add=True)
     updated = models.DateTimeField(_('Дата последнего обновления'), auto_now=True)
 
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='user_posts')
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='user_posts', null=True, blank=True)
 
     comments = GenericRelation('mainapp.Comment')
     images = GenericRelation('mainapp.Image')
@@ -92,11 +92,9 @@ class Comment(models.Model):
     created = models.DateTimeField(_('Дата создания'), auto_now_add=True)
     updated = models.DateTimeField(_('Дата последнего обновления'), auto_now=True)
 
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='user_comments')
-    reply_comment = models.OneToOneField(
-        'Comment', on_delete=models.SET_NULL, verbose_name=_('Ответ на комментарий'), default=None
-    )
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='user_comments', null=True, blank=True)
 
+    # Only User & Post
     content_type = models.ForeignKey(ContentType, on_delete=models.DO_NOTHING)
     object_id = models.PositiveIntegerField()
     content_object = GenericForeignKey()
@@ -105,9 +103,10 @@ class Comment(models.Model):
     videos = GenericRelation('mainapp.Video')
 
     def __str__(self):
-        if self.reply_comment is None:
-            return f'Comment: {self.pk}'
-        return f'Replay to comment: {self.reply_comment.pk}'
+        # Если content_type == Comment, то будет ответ на комментарий
+        # Иначе будет просто комментарий
+
+        pass
 
     class Meta:
         verbose_name = _('Коммент')
