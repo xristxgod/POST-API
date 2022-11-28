@@ -1,3 +1,5 @@
+from typing import Union, Optional
+
 from django.db import models, transaction
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
@@ -34,6 +36,18 @@ class Post(models.Model):
     comments = GenericRelation('mainapp.Comment')
     images = GenericRelation('mainapp.Image')
     videos = GenericRelation('mainapp.Video')
+
+    def add_file(self, file_name: str, data: Union[str, bytes], main: Optional[bool] = None):
+        params = {}
+        if main:
+            params.update({'main': main})
+
+        if file_name == 'image':
+            params.update({'image': data} if isinstance(data, bytes) else {'image_url': data})
+            Image.create(obj_name=self.__class__.__name__, obj_id=self.pk, **params)
+        elif file_name == 'viedo':
+            params.update({'video': data} if isinstance(data, bytes) else {'video_url': data})
+            Video.create(obj_name=self.__class__.__name__, obj_id=self.pk, **params)
 
     def __str__(self):
         return f'{self.title}'
