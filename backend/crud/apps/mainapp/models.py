@@ -1,8 +1,10 @@
-from django.db import models
+from django.db import models, transaction
 from django.conf import settings
 from django.utils.translation import gettext_lazy as _
 from django.contrib.contenttypes.models import ContentType
 from django.contrib.contenttypes.fields import GenericForeignKey, GenericRelation
+
+from .utils import get_content_value
 
 
 class User(models.Model):
@@ -44,7 +46,7 @@ class Post(models.Model):
 class Image(models.Model):
     main = models.BooleanField(_('Основное фото'), default=False)
     image = models.ImageField(_('Фото'), default=None)
-    video_url = models.URLField(_('Ссылка на фото'), default=None, validators=[])
+    image_url = models.URLField(_('Ссылка на фото'), default=None, validators=[])
 
     active = models.BooleanField(_('Активное'), default=True)
 
@@ -58,6 +60,22 @@ class Image(models.Model):
     def url(self):
         raise NotImplementedError
 
+    @classmethod
+    def create(cls, main: bool, **extra):
+        with transaction.atomic():
+            cls.objects.create(
+                main=main,
+                **get_content_value(extra['obj_name'], extra['obj_id']),
+                **{'image': extra['image']} if extra.get('image') else {'image_url': extra['image_url']}
+            )
+
+    def update(self, **extra):
+        with transaction.atomic():
+            # ...Validator...
+            for key, val in extra.values():
+                setattr(self, key, val)
+            self.save()
+
     class Meta:
         verbose_name = _('Картинка')
         verbose_name_plural = _('Картинки')
@@ -65,7 +83,6 @@ class Image(models.Model):
 
 class Video(models.Model):
     main = models.BooleanField(_('Основное видео'), default=False)
-
     video = models.FileField(_('Видео'), default=None)
     video_url = models.URLField(_('Ссылка на видео'), default=None, validators=[])
 
@@ -80,6 +97,22 @@ class Video(models.Model):
     @property
     def url(self):
         raise NotImplementedError
+
+    @classmethod
+    def create(cls, main: bool, **extra):
+        with transaction.atomic():
+            cls.objects.create(
+                main=main,
+                **get_content_value(extra['obj_name'], extra['obj_id']),
+                **{'video': extra['video']} if extra.get('video') else {'video_url': extra['video_url']}
+            )
+
+    def update(self, **extra):
+        with transaction.atomic():
+            # ...Validator...
+            for key, val in extra.values():
+                setattr(self, key, val)
+            self.save()
 
     class Meta:
         verbose_name = _('Видео')
@@ -108,7 +141,20 @@ class Comment(models.Model):
 
         pass
 
+    @classmethod
+    def create(cls, text: str, user: User, **extra):
+        with transaction.atomic():
+            cls.objects.create(
+                text=text, user=user,
+                **get_content_value(extra['obj_name'], extra['obj_id'])
+            )
+
+    def update(self, text: str):
+        with transaction.atomic():
+            # ...Validator...
+            self.text = text
+            self.save()
+
     class Meta:
         verbose_name = _('Коммент')
         verbose_name_plural = _('Комменты')
-
